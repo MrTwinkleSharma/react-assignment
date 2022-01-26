@@ -1,32 +1,44 @@
-import TextField from '@mui/material/TextField';
-import AddIcon from '@mui/icons-material/Add';
-import Button from '@mui/material/Button';
+//3rd Party Modules
 import { useEffect, useState } from 'react';
 import { Paper, Stack } from '@mui/material';
-import axios from 'axios';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ClearIcon from '@mui/icons-material/Clear';
+import axios from 'axios';
 
+//This window2 is the most responsible and heaviest component
 export default function Window2(props){
+    //The data is came from the App, either from initals or after manipulation of setData from window3
+    //The EditingMode is to determine whether the Window2 is on editingMode or Adding Mode
+    //The setWindow2Changed is used to set that window2 has changed so that window3 can re render
     const {data, editingMode, setWindow2Changed, setEditingMode} = props;
+
+    //This count will be used to store the number of times user uses the Add or Update API,
+    //And will be stored in the localStorage for Data Persistence, 
+    //otherwise we have to use another collection in Database
     const [count, setCount] = useState(0);
 
+    //Setting Inital Value of Form 
     const [value, setValue] = useState({
         title: '',
         description: ''
     });
     
+    //To set the value if form is going to be on editing mode, by the data which came from the Window3 
+    //And storage of Count in Local Storage
     useEffect(()=>{
         setValue({
             title: data.title,
             description: data.description
         })
         const initialCount = localStorage.getItem('count');
-        console.log("HERe");
         setCount(initialCount);
     }, [data]);
     
+    //This is used for controlled input
     const inputChangeHandler = (event)=>{
         if(event.target.name=='title'){
             setValue({
@@ -39,64 +51,66 @@ export default function Window2(props){
             })
         }
     }
+    //To refresh input fields
     const refreshInput = ()=>{
         setValue({title:'', description:''});
     }
+
+    //To discard the editing of The existing item and setting editing mode to false again 
+    //and refreshing input
     const discardHandler = ()=>{
     	if(editingMode){
-    	setEditingMode(prevState=>!prevState);
+    	    setEditingMode(prevState=>!prevState);
 		}
 		refreshInput();
     }
 
+    //To submit the POST request on the server
     const submitHandler = async(event) => {
         event.preventDefault();
-        // console.log(value);
         if(editingMode)
-        axios({
-            method:"PATCH",
-            url: `${process.env.REACT_APP_BACKEND_URL}/${data.id}`,
-            data:JSON.stringify({
-                title:value.title,
-                description:value.description,
-            }),
-            headers: { "Content-Type": "application/json" }
-        })
-        .then(()=>{
-            console.log("Successful");
-            refreshInput();
-            setWindow2Changed(prevState=>!prevState);
-            setCount(prevState=>prevState+1);
-            let tempCount = count + 1;
-            localStorage.setItem('count', tempCount);
-            setEditingMode(prevState=>!prevState);
+            axios({
+                method:"PATCH",
+                url: `${process.env.REACT_APP_BACKEND_URL}/${data.id}`,
+                data:JSON.stringify({
+                    title:value.title,
+                    description:value.description,
+                }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(()=>{
+                refreshInput();
+                setWindow2Changed(prevState=>!prevState);
+                setCount(prevState=>prevState+1);
+                setEditingMode(prevState=>!prevState);
 
-        })
-        .catch((err)=>{
-            // console.log(err);
-        })
+                let tempCount = count + 1;
+                localStorage.setItem('count', tempCount);
+
+            })
+            .catch((err)=>{
+            })
 
         else
-        axios({
-            method:"POST",
-            url:process.env.REACT_APP_BACKEND_URL,
-            data:JSON.stringify({
-                title:value.title,
-                description:value.description,
-            }),
-            headers: { "Content-Type": "application/json" }
-        })
-        .then(()=>{
-            console.log("Successful");
-            refreshInput();
-            setWindow2Changed(prevState=>!prevState);
-            setCount(prevState=>prevState+1);
-            let tempCount = count + 1;
-            localStorage.setItem('count', tempCount);
-        })
-        .catch((err)=>{
-            // console.log(err);
-        })
+            axios({
+                method:"POST",
+                url:process.env.REACT_APP_BACKEND_URL,
+                data:JSON.stringify({
+                    title:value.title,
+                    description:value.description,
+                }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(()=>{
+                refreshInput();
+                setWindow2Changed(prevState=>!prevState);
+                setCount(prevState=>prevState+1);
+                
+                let tempCount = count + 1;
+                localStorage.setItem('count', tempCount);
+            })
+            .catch((err)=>{
+            })
     }
     return <>
     <h2 style={{color:'#0000ff'}}>Add the Item</h2>
