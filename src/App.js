@@ -10,7 +10,8 @@ import Window3 from '../src/Windows/Window3';
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  textAlign: 'center',
+  // textAlign: 'center',
+  elevation:12,
   color: theme.palette.text.secondary,
 }));
 
