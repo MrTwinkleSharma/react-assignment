@@ -9,10 +9,6 @@ const TaskModel = new mongoose.Schema({
     description:{
         required:true,
         type:String
-    },
-    isCompleted:{
-        required:true,
-        type:Boolean
     }
 });
 

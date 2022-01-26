@@ -5,23 +5,21 @@ import DisplayItem from './DisplayItem';
 
 export default function Window3(props){
     const [list, setList] = useState([]);
-    const [changed, setChanged] = useState(false);
+    const [window3Changed, setWindow3Changed] = useState(false);
 
     useEffect(()=>{        
         axios.get(process.env.REACT_APP_BACKEND_URL)
         .then((response)=>{
-            console.log(response.data)
-            setList(response.data);
+            setList(response.data.data);
        }).catch((err)=>{
-            console.log(err);
        });
-    },[changed]);
+    },[window3Changed, props.window2Changed]);
     
     return <>
-        <h2  style={{color:'#1976d2'}}>List of the Items</h2>
+        <h2  style={{color:'#0000ff'}}>List of the Items</h2>
         { 
             list && list.map(listItem =>{
-                return <DisplayItem listItem={listItem} props/>
+                return <DisplayItem key={listItem.id} listItem={listItem} setData={props.setData} setEdit={props.setEdit} setWindow3Changed={setWindow3Changed}/>
             })
         }
     </>
