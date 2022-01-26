@@ -6,7 +6,6 @@ const getTasks = async (req, res) =>{
     list = await TaskModel.find();
     }
     catch(err){
-        // throw new Error("Couldn't Find the Todo List due to Server Problem.");
         return res.status(500).json({success:false, message:"Couldn't add the Todo in List due to Server Problem."});
     }
     res.status(200).json({success:true, data:list.map(listItem =>listItem.toObject({getters:true}))})
@@ -23,7 +22,6 @@ const postTask = async (req, res) =>{
     }
     catch(err){
         console.log(err);
-        // throw new Error("Couldn't Find the Todo List due to Server Problem.");
         return res.status(500).json({success:false, message:"Couldn't add the Todo in List due to Server Problem."});   
     }
     res.status(201).json({success:true, data:task});
