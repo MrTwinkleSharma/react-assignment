@@ -16,6 +16,10 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function App() {
+  const [editingMode, setEditingMode] = React.useState(false);
+  const [dataForEdit, setDataForEdit] = React.useState();
+  
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
@@ -26,12 +30,12 @@ export default function App() {
         </Grid>
         <Grid item xs={6} md={8}>
           <Item>
-            <Window2/>
+            <Window2 editingMode={editingMode} data={dataForEdit}/>
           </Item>
         </Grid>
         <Grid item xs={12} md={12}>
           <Item>
-            <Window3/>
+            <Window3 setEdit={setEditingMode} setData={setDataForEdit}/>
           </Item>
         </Grid>
       </Grid>
