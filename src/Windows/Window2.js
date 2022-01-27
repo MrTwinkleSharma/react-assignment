@@ -17,7 +17,7 @@ export default function Window2(props){
     const {data, editingMode, setWindow2Changed, setEditingMode} = props;
     
     //To Block the submit on invalid input
-    const [disableOnEmpty, setDisableOnEmpty] = useState(false);
+    const [disableOnEmpty, setDisableOnEmpty] = useState(true);
 
     //This count will be used to store the number of times user uses the Add or Update API,
     //And will be stored in the localStorage for Data Persistence, 
@@ -37,6 +37,7 @@ export default function Window2(props){
             title: data.title,
             description: data.description
         })
+        setDisableOnEmpty(false);
         const initialCount = localStorage.getItem('count');
         if(initialCount===null) setCount(0);
         else setCount(initialCount);
