@@ -15,11 +15,14 @@ export default function Window2(props){
     //The EditingMode is to determine whether the Window2 is on editingMode or Adding Mode
     //The setWindow2Changed is used to set that window2 has changed so that window3 can re render
     const {data, editingMode, setWindow2Changed, setEditingMode} = props;
+    
+    //To Block the submit on invalid input
+    const [disableOnEmpty, setDisableOnEmpty] = useState(false);
 
     //This count will be used to store the number of times user uses the Add or Update API,
     //And will be stored in the localStorage for Data Persistence, 
     //otherwise we have to use another collection in Database
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState();
 
     //Setting Inital Value of Form 
     const [value, setValue] = useState({
@@ -35,21 +38,33 @@ export default function Window2(props){
             description: data.description
         })
         const initialCount = localStorage.getItem('count');
-        setCount(initialCount);
+        if(initialCount===null) setCount(0);
+        else setCount(initialCount);
+
     }, [data]);
     
     //This is used for controlled input
     const inputChangeHandler = (event)=>{
-        if(event.target.name=='title'){
+        let tempState = value;
+
+        if(event.target.name==='title'){
             setValue({
                 ...value, title:event.target.value
             })
+            tempState = {...tempState, title:event.target.value}
         }
-        if(event.target.name=='description'){
+        if(event.target.name==='description'){
             setValue({
                 ...value, description:event.target.value
             })
+            tempState = {...tempState, description:event.target.value}
         }
+
+        if(tempState.title.length>5 && tempState.description.length>5){
+            setDisableOnEmpty(false);
+        }
+        else
+        setDisableOnEmpty(true); 
     }
     //To refresh input fields
     const refreshInput = ()=>{
@@ -81,12 +96,14 @@ export default function Window2(props){
             .then(()=>{
                 refreshInput();
                 setWindow2Changed(prevState=>!prevState);
-                setCount(prevState=>prevState+1);
+                setCount(prevState=>{
+                   return parseInt(prevState)+1;
+                });
                 setEditingMode(prevState=>!prevState);
 
-                let tempCount = count + 1;
+                let tempCount = parseInt(count) + 1;
+                console.log(tempCount);
                 localStorage.setItem('count', tempCount);
-
             })
             .catch((err)=>{
             })
@@ -104,9 +121,11 @@ export default function Window2(props){
             .then(()=>{
                 refreshInput();
                 setWindow2Changed(prevState=>!prevState);
-                setCount(prevState=>prevState+1);
-                
-                let tempCount = count + 1;
+                setCount(prevState=>{
+                    return parseInt(prevState)+1;
+                });
+           
+                let tempCount = parseInt(count) + 1;
                 localStorage.setItem('count', tempCount);
             })
             .catch((err)=>{
@@ -119,8 +138,26 @@ export default function Window2(props){
             <TextField id="outlined-basic" label="Title" name="title" value={value.title} onChange={inputChangeHandler} variant="outlined" />
             <TextField id="outlined-basic" label="Description" name="description" value={value.description} onChange={inputChangeHandler} variant="outlined" />
             <Stack spacing={1} direction="row">
-                <Button style={{color:'#0000ff', border:'1px solid #0000ff'}} onClick={submitHandler} fullWidth variant="outlined" startIcon={ editingMode ? <ArrowUpwardIcon/> : <AddIcon /> }>{ editingMode ?  'Update' : 'Add' }</Button>
-                <Button style={{color:'#0000ff', border:'1px solid #0000ff'}} onClick={discardHandler} fullWidth variant="outlined" startIcon={editingMode ? <ClearIcon/> : <RefreshIcon />}> {editingMode ? 'Discard' : 'Clear Input'}</Button>
+                <Button 
+                style={{color:'#0000ff', border:'1px solid #0000ff'}} 
+                onClick={submitHandler} 
+                fullWidth 
+                variant="outlined" 
+                startIcon={ editingMode ? <ArrowUpwardIcon/> : <AddIcon /> }
+                disabled={disableOnEmpty}
+                > 
+                    { editingMode ?  'Update' : 'Add' }
+                </Button>
+
+                <Button 
+                style={{color:'#0000ff', border:'1px solid #0000ff'}} 
+                onClick={discardHandler} 
+                fullWidth 
+                variant="outlined" 
+                startIcon={editingMode ? <ClearIcon/> : <RefreshIcon />}
+                > 
+                    {editingMode ? 'Discard' : 'Clear Input'}
+                </Button>
             </Stack>
             <Paper sx={{textAlign:'center'}} elevation={4}> <h4>Number of Times the User called Add & Update API: {count} </h4></Paper>
         </Stack>

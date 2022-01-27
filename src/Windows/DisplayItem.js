@@ -46,7 +46,6 @@ export default function DisplayItem(props){
       }).then(()=>{
         props.setWindow3Changed(prevState=>!prevState);
       }).catch((err)=>{
-        console.log(err);
       })
     }
 
